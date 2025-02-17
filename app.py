@@ -4,7 +4,8 @@ import numpy as np
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import base64
 from io import BytesIO
-from PIL import Image
+#from PIL import Image
+import Image
 
 app = Flask(__name__)
 
