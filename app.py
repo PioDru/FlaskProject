@@ -7,13 +7,47 @@ from io import BytesIO
 from PIL import Image
 #import Image
 import traceback
-app = Flask(__name__)
+from functools import wraps
+import os
+'''
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
+'''
 
+app = Flask(__name__)
+API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowych
+print("API_KEY=", API_KEY)
 # Ładowanie modelu (plik .h5 lub .keras)
 model = tf.keras.models.load_model("pneumonia_classification_model.keras")
+'''
+limiter = Limiter(
+    app,
+    #key_func=get_remote_address,
+    default_limits=["1000 per day", "100 per minute"]
+)
+'''
+'''
+Talisman(app,
+    force_https=True,
+    strict_transport_security=True,
+    content_security_policy={
+        'default-src': "'self'"
+    }
+)
+'''
 
+def require_api_key(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key')
+        if api_key and api_key == API_KEY:
+            return f(*args, **kwargs)
+        return jsonify({"error": "Unauthorized"}), 401
+    return decorated
 
 @app.route('/predict', methods=['POST'])
+@require_api_key
 def predict():
     # Oczekujemy danych wejściowych jako JSON z kluczem "image_base64"
     print('predict - enter')
@@ -50,4 +84,5 @@ def predict():
     '''
 
 if __name__ == '__main__':
+    #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc')
     app.run(host='0.0.0.0', port=5000, debug=True)
