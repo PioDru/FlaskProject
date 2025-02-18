@@ -57,23 +57,23 @@ def predict():
 
     #if 'file' not in request.files:
         #return jsonify({"error": "Brak pliku w żądaniu. Upewnij się, że wysyłasz plik z kluczem 'file'."}), 400
+    try:
+        #file = request.files['file']
+        #image_b64 = request.get_data(as_text=True)
+        #image_bytes = base64.b64decode(image_b64)
+        image_bytes = request.get_data()
+        image = Image.open(BytesIO(image_bytes)).convert("RGB")
 
-    #file = request.files['file']
-    #image_b64 = request.get_data(as_text=True)
-    #image_bytes = base64.b64decode(image_b64)
-    image_bytes = request.get_data()
-    image = Image.open(BytesIO(image_bytes)).convert("RGB")
+        image = image.resize((150, 150))
+        img_array = img_to_array(image)
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
 
-    image = image.resize((150, 150))
-    img_array = img_to_array(image)
-    img_array = np.expand_dims(img_array, axis=0) / 255.0
+        # Predykcja
+        prediction = model.predict(img_array)[0][0]
+        label = "Pneumonia" if prediction > 0.5 else "Normal"
+        print(jsonify({"prediction": float(prediction), "label": label}))
+        return jsonify({"prediction": float(prediction), "label": label})
 
-    # Predykcja
-    prediction = model.predict(img_array)[0][0]
-    label = "Pneumonia" if prediction > 0.5 else "Normal"
-    print(jsonify({"prediction": float(prediction), "label": label}))
-    return jsonify({"prediction": float(prediction), "label": label})
-    '''
     except Exception as e:
         error_details = {
             "error": "Internal Server Error",
@@ -81,7 +81,7 @@ def predict():
             "trace": traceback.format_exc()
         }
         return jsonify(error_details), 500
-    '''
+
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc')
