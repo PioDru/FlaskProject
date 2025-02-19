@@ -9,6 +9,7 @@ from PIL import Image
 import traceback
 from functools import wraps
 import os
+from flask_cors import CORS
 '''
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -16,6 +17,15 @@ from flask_talisman import Talisman
 '''
 
 app = Flask(__name__)
+
+CORS(app, resources={
+    r"/predict": {
+        "origins": "*",
+        "methods": ["POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "X-API-Key"]
+    }
+})
+
 API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowych
 print("API_KEY=", API_KEY)
 # Ładowanie modelu (plik .h5 lub .keras)
@@ -49,6 +59,7 @@ def require_api_key(f):
 @app.route('/predict', methods=['POST'])
 @require_api_key
 def predict():
+
     # Oczekujemy danych wejściowych jako JSON z kluczem "image_base64"
     print('predict - enter')
 
