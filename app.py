@@ -29,7 +29,9 @@ CORS(app, resources={
 API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowych
 print("API_KEY=", API_KEY)
 # Ładowanie modelu (plik .h5 lub .keras)
-model = tf.keras.models.load_model("pneumonia_classification_model.keras")
+#model = tf.keras.models.load_model("pneumonia_classification_model.keras")
+model = tf.keras.models.load_model("pneumonia_classification_model_bal.keras")
+#model = tf.keras.models.load_model("pneumonia_classification_model_bal_grayscale.keras")
 '''
 limiter = Limiter(
     app,
@@ -68,12 +70,16 @@ def predict():
 
     #if 'file' not in request.files:
         #return jsonify({"error": "Brak pliku w żądaniu. Upewnij się, że wysyłasz plik z kluczem 'file'."}), 400
+
     try:
+
         #file = request.files['file']
         #image_b64 = request.get_data(as_text=True)
         #image_bytes = base64.b64decode(image_b64)
         image_bytes = request.get_data()
         image = Image.open(BytesIO(image_bytes)).convert("RGB")
+        # tylko dla modelu GRAYSCALE
+        #image = image.convert('L')  # 'L' oznacza skalę szarości
 
         image = image.resize((150, 150))
         img_array = img_to_array(image)
