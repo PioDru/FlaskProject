@@ -29,7 +29,14 @@ CORS(app, resources={
 API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowych
 print("API_KEY=", API_KEY)
 # Ładowanie modelu (plik .h5 lub .keras)
-model = tf.keras.models.load_model("pneumonia_classification_model.keras")
+#model = tf.keras.models.load_model("pneumonia_classification_model.keras")
+model = tf.keras.models.load_model("pneumonia_classification_model_bal.keras")
+#model = tf.keras.models.load_model("pneumonia_classification_model_bal_grayscale.keras")
+modelUsg = tf.keras.models.load_model("breast_usg_model.keras")
+
+# Mapowanie indeksów na etykiety klas – kolejność musi odpowiadać kolejności użytej podczas trenowania modelu
+class_names = ['benign', 'malignant', 'normal']
+
 '''
 limiter = Limiter(
     app,
@@ -68,12 +75,16 @@ def predict():
 
     #if 'file' not in request.files:
         #return jsonify({"error": "Brak pliku w żądaniu. Upewnij się, że wysyłasz plik z kluczem 'file'."}), 400
+
     try:
+
         #file = request.files['file']
         #image_b64 = request.get_data(as_text=True)
         #image_bytes = base64.b64decode(image_b64)
         image_bytes = request.get_data()
         image = Image.open(BytesIO(image_bytes)).convert("RGB")
+        # tylko dla modelu GRAYSCALE
+        #image = image.convert('L')  # 'L' oznacza skalę szarości
 
         image = image.resize((150, 150))
         img_array = img_to_array(image)
@@ -93,7 +104,52 @@ def predict():
         }
         return jsonify(error_details), 500
 
+@app.route('/predictusg', methods=['POST'])
+@require_api_key
+def predictusg():
+
+    # Oczekujemy danych wejściowych jako JSON z kluczem "image_base64"
+    print('predictusg - enter')
+
+    print('request files: ', request.files.keys())
+    print('request data: ', request.get_data())
+
+    #if 'file' not in request.files:
+        #return jsonify({"error": "Brak pliku w żądaniu. Upewnij się, że wysyłasz plik z kluczem 'file'."}), 400
+
+    try:
+
+        #file = request.files['file']
+        #image_b64 = request.get_data(as_text=True)
+        #image_bytes = base64.b64decode(image_b64)
+        image_bytes = request.get_data()
+        image = Image.open(BytesIO(image_bytes)).convert("RGB")
+
+
+        image = image.resize((150, 150))
+        img_array = img_to_array(image)
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
+
+        # Predykcja
+        preds = modelUsg.predict(img_array)
+        print('predictions', preds)
+        predicted_index = np.argmax(preds, axis=1)[0]
+        predicted_class = class_names[predicted_index]
+        confidence = float(np.max(preds))
+
+        return jsonify({
+            'predicted_class': predicted_class,
+            'confidence': confidence
+        })
+
+    except Exception as e:
+        error_details = {
+            "error": "Internal Server Error",
+            "message": str(e),
+            "trace": traceback.format_exc()
+        }
+        return jsonify(error_details), 500
+
 
 if __name__ == '__main__':
-    #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc')
     app.run(host='0.0.0.0', port=5000, debug=True)
