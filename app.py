@@ -23,6 +23,11 @@ CORS(app, resources={
         "origins": "*",
         "methods": ["POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "X-API-Key"]
+    },
+    r"/predictUsg": {
+        "origins": "*",
+        "methods": ["POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "X-API-Key"]
     }
 })
 
