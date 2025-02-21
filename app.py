@@ -10,6 +10,8 @@ import traceback
 from functools import wraps
 import os
 from flask_cors import CORS
+import stat
+from datetime import datetime
 '''
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -37,6 +39,36 @@ print("API_KEY=", API_KEY)
 MODEL_RTG_PATH = os.getenv('MODEL_RTG_PATH', 'pneumonia_classification_model_bal.keras')
 MODEL_USG_PATH = os.getenv('MODEL_USG_PATH', 'breast_usg_model.keras')
 
+@app.route('/models', methods=['GET'])
+def list_models():
+    try:
+        models_dir = '/app/models'
+        files_info = []
+
+        for root, dirs, files in os.walk(models_dir):
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                file_stat = os.stat(file_path)
+                files_info.append({
+                    'name': file_name,
+                    'path': file_path,
+                    'size': file_stat.st_size,
+                    'permissions': stat.filemode(file_stat.st_mode),
+                    'modified': datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+                    'uid': file_stat.st_uid,
+                    'gid': file_stat.st_gid
+                })
+        print (jsonify({
+            'directory': models_dir,
+            'files': files_info
+        }))
+        return jsonify({
+            'directory': models_dir,
+            'files': files_info
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 def load_model_from_volume(model_path):
     try:
@@ -53,7 +85,7 @@ def load_model_from_volume(model_path):
         print(f"Błąd podczas wczytywania modelu: {str(e)}")
         #raise
 
-
+list_models()
 
 # Wczytanie modelu przy starcie
 model = load_model_from_volume(MODEL_RTG_PATH)
@@ -181,4 +213,5 @@ def predictusg():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
