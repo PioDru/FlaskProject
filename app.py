@@ -99,8 +99,8 @@ def predict():
     # Oczekujemy danych wejściowych jako JSON z kluczem "image_base64"
     print('predict - enter')
 
-    print('request files: ', request.files.keys())
-    print('request data: ', request.get_data())
+    #print('request files: ', request.files.keys())
+    #print('request data: ', request.get_data())
 
     #if 'file' not in request.files:
         #return jsonify({"error": "Brak pliku w żądaniu. Upewnij się, że wysyłasz plik z kluczem 'file'."}), 400
@@ -140,8 +140,8 @@ def predictusg():
     # Oczekujemy danych wejściowych jako JSON z kluczem "image_base64"
     print('predictusg - enter')
 
-    print('request files: ', request.files.keys())
-    print('request data: ', request.get_data())
+    #print('request files: ', request.files.keys())
+    #print('request data: ', request.get_data())
 
     #if 'file' not in request.files:
         #return jsonify({"error": "Brak pliku w żądaniu. Upewnij się, że wysyłasz plik z kluczem 'file'."}), 400
