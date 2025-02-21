@@ -12,6 +12,7 @@ import os
 from flask_cors import CORS
 import stat
 from datetime import datetime
+import json
 '''
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -39,17 +40,19 @@ print("API_KEY=", API_KEY)
 MODEL_RTG_PATH = os.getenv('MODEL_RTG_PATH', 'pneumonia_classification_model_bal.keras')
 MODEL_USG_PATH = os.getenv('MODEL_USG_PATH', 'breast_usg_model.keras')
 
-@app.route('/models', methods=['GET'])
+
 def list_models():
     try:
         models_dir = '/app/models'
         files_info = []
 
+        print("\n=== Starting directory listing of /app/models ===")
+
         for root, dirs, files in os.walk(models_dir):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 file_stat = os.stat(file_path)
-                files_info.append({
+                file_info = {
                     'name': file_name,
                     'path': file_path,
                     'size': file_stat.st_size,
@@ -57,21 +60,25 @@ def list_models():
                     'modified': datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
                     'uid': file_stat.st_uid,
                     'gid': file_stat.st_gid
-                })
-        print (jsonify({
-            'directory': models_dir,
-            'files': files_info
-        }))
-        return jsonify({
-            'directory': models_dir,
-            'files': files_info
-        })
+                }
+                files_info.append(file_info)
+
+                # Log each file details
+                print(f"\nFile: {file_name}")
+                print(json.dumps(file_info, indent=2))
+
+        print("\n=== Directory listing complete ===")
+        return files_info
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error listing directory: {str(e)}")
+        return []
 
 def load_model_from_volume(model_path):
     try:
+        print("\n=== Checking model directory contents ===")
+        files = list_models()
+        print(f"Found {len(files)} files in models directory")
         print(f"Wczytywanie modelu z {model_path}")
         if not os.path.exists(model_path):
             #raise FileNotFoundError(f"Model nie znaleziony w {model_path}")
@@ -85,7 +92,7 @@ def load_model_from_volume(model_path):
         print(f"Błąd podczas wczytywania modelu: {str(e)}")
         #raise
 
-list_models()
+
 
 # Wczytanie modelu przy starcie
 model = load_model_from_volume(MODEL_RTG_PATH)
@@ -210,7 +217,10 @@ def predictusg():
             "trace": traceback.format_exc()
         }
         return jsonify(error_details), 500
-
+@app.route('/models', methods=['GET'])
+@require_api_key
+def get_models():
+    return jsonify({'files': list_models()})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
