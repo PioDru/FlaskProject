@@ -198,8 +198,11 @@ def predictusg():
         image_bytes = request.get_data()
         image = Image.open(BytesIO(image_bytes)).convert("RGB")
 
+        if MODEL_USG_PATH == 'breast_usg_model.keras':
+            image = image.resize((150, 150))
+        else:
+            image = image.resize((200, 200))
 
-        image = image.resize((150, 150))
         img_array = img_to_array(image)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 
