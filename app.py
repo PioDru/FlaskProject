@@ -13,6 +13,9 @@ from flask_cors import CORS
 import stat
 from datetime import datetime
 import json
+
+from download_model import download_model
+
 '''
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -93,6 +96,8 @@ def load_model_from_volume(model_path):
         #raise
 
 
+#pobranie modeli z Azure Blob Storage
+download_model()
 
 # Wczytanie modelu przy starcie
 model = load_model_from_volume(MODEL_RTG_PATH)
