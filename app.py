@@ -33,11 +33,33 @@ CORS(app, resources={
 
 API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowych
 print("API_KEY=", API_KEY)
+
+MODEL_RTG_PATH = os.getenv('MODEL_RTG_PATH', 'pneumonia_classification_model_bal.keras')
+MODEL_USG_PATH = os.getenv('MODEL_RTG_PATH', 'breast_usg_model.keras')
+
+
+def load_model_from_volume(model_path):
+    try:
+        print(f"Wczytywanie modelu z {model_path}")
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model nie znaleziony w {model_path}")
+
+        modelml = tf.keras.models.load_model(model_path)
+        print("Model wczytany pomyślnie")
+        return modelml
+
+    except Exception as e:
+        print(f"Błąd podczas wczytywania modelu: {str(e)}")
+        raise
+
+
+# Wczytanie modelu przy starcie
+model = load_model_from_volume(MODEL_RTG_PATH)
+modelUsg = load_model_from_volume(MODEL_USG_PATH)
+
 # Ładowanie modelu (plik .h5 lub .keras)
-#model = tf.keras.models.load_model("pneumonia_classification_model.keras")
-model = tf.keras.models.load_model("pneumonia_classification_model_bal.keras")
-#model = tf.keras.models.load_model("pneumonia_classification_model_bal_grayscale.keras")
-modelUsg = tf.keras.models.load_model("breast_usg_model.keras")
+#model = tf.keras.models.load_model("pneumonia_classification_model_bal.keras")
+#modelUsg = tf.keras.models.load_model("breast_usg_model.keras")
 
 # Mapowanie indeksów na etykiety klas – kolejność musi odpowiadać kolejności użytej podczas trenowania modelu
 class_names = ['benign', 'malignant', 'normal']

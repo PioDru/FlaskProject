@@ -14,6 +14,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kopiujemy cały projekt do kontenera
 COPY . .
 
+# Utworzenie katalogu dla modelu
+RUN mkdir -p /app/models
+
+# Model będzie dostępny w /app/models po zamontowaniu volume
+ENV MODEL_RTG_PATH=/app/models/pneumonia_classification_model_bal.keras
+ENV MODEL_USG_PATH=/app/models/breast_usg_model.keras
+
 # Ustawiamy port, na którym będzie działała aplikacja
 EXPOSE 5000
 
