@@ -21,6 +21,9 @@ RUN mkdir -p /app/models
 ENV MODEL_RTG_PATH=pneumonia_classification_model_bal.keras
 ENV MODEL_USG_PATH=breast_usg_model.keras
 
+# Pobranie modelu podczas budowania obrazu
+RUN python download_model.py
+
 # Ustawiamy port, na którym będzie działała aplikacja
 EXPOSE 5000
 

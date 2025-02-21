@@ -42,7 +42,8 @@ def load_model_from_volume(model_path):
     try:
         print(f"Wczytywanie modelu z {model_path}")
         if not os.path.exists(model_path):
-            raise FileNotFoundError(f"Model nie znaleziony w {model_path}")
+            #raise FileNotFoundError(f"Model nie znaleziony w {model_path}")
+            print(f"Model nie znaleziony w {model_path}")
 
         modelml = tf.keras.models.load_model(model_path)
         print("Model wczytany pomyślnie")
@@ -50,7 +51,8 @@ def load_model_from_volume(model_path):
 
     except Exception as e:
         print(f"Błąd podczas wczytywania modelu: {str(e)}")
-        raise
+        #raise
+
 
 
 # Wczytanie modelu przy starcie
