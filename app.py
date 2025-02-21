@@ -35,7 +35,7 @@ API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowyc
 print("API_KEY=", API_KEY)
 
 MODEL_RTG_PATH = os.getenv('MODEL_RTG_PATH', 'pneumonia_classification_model_bal.keras')
-MODEL_USG_PATH = os.getenv('MODEL_RTG_PATH', 'breast_usg_model.keras')
+MODEL_USG_PATH = os.getenv('MODEL_USG_PATH', 'breast_usg_model.keras')
 
 
 def load_model_from_volume(model_path):
