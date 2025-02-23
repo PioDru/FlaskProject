@@ -200,6 +200,10 @@ def predictusg():
 
         if MODEL_USG_PATH == 'breast_usg_model.keras':
             image = image.resize((150, 150))
+        elif  "300x300" in MODEL_USG_PATH:
+            image = image.resize((300, 300))
+        elif  "224x224" in MODEL_USG_PATH:
+            image = image.resize((224, 224))
         elif  "200x200" in MODEL_USG_PATH:
             image = image.resize((200, 200))
         elif  "150x150" in MODEL_USG_PATH:
