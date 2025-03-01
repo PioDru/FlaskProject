@@ -38,7 +38,7 @@ CORS(app, resources={
 })
 
 API_KEY = os.getenv('API_KEY')  # klucz przechowywany w zmiennych środowiskowych
-print("API_KEY=", API_KEY)
+#print("API_KEY=", API_KEY)
 
 MODEL_RTG_PATH = os.getenv('MODEL_RTG_PATH', 'pneumonia_classification_model_bal.keras')
 MODEL_USG_PATH = os.getenv('MODEL_USG_PATH', 'breast_usg_model.keras')
