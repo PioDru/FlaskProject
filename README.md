@@ -178,7 +178,7 @@ Aby korzystać z endpointów REST API, musisz użyć nagłówka `X-API-Key`, kt�
     ```
 
   1. **POST /predict**  
-     Analizuje dane wejściowe i zwraca wyniki przetwarzania.
+     Analizuje dane wejściowe i zwraca wyniki przetwarzania dla obrazów RTG płuc.
 
      - **Dane wejściowe:** Binarne
      - **Nagłówki:** `X-API-Key` z poprawnym kluczem
@@ -192,7 +192,7 @@ Aby korzystać z endpointów REST API, musisz użyć nagłówka `X-API-Key`, kt�
 
 
 2. **POST /predictusg**  
-   Analizuje dane wejściowe i zwraca wyniki przetwarzania.
+   Analizuje dane wejściowe i zwraca wyniki przetwarzania dla obrazów USG piersi.
 
    - **Dane wejściowe:** Binarne
    - **Nagłówki:** `X-API-Key` z poprawnym kluczem
